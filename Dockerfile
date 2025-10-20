@@ -1,5 +1,5 @@
 # Multi-stage build để optimize image size
-FROM maven:3.9.9-openjdk-21 AS build
+FROM maven:3.8.6-openjdk-21 AS build
 
 # Set working directory
 WORKDIR /app

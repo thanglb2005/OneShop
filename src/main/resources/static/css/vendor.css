@@ -1,0 +1,162 @@
+/* Vendor management styles */
+.vendor-navbar {
+  background: linear-gradient(135deg, #1d4ed8 0%, #0f172a 100%);
+  padding: 0.85rem 0;
+}
+
+.vendor-navbar .navbar-brand {
+  color: #fff;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 1.125rem;
+}
+
+.vendor-navbar .navbar-brand:hover {
+  color: #e2e8f0;
+}
+
+.vendor-navbar .nav-link {
+  color: rgba(226, 232, 240, 0.85);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.vendor-navbar .nav-link .fas {
+  font-size: 0.85rem;
+}
+
+.vendor-navbar .nav-link:hover,
+.vendor-navbar .nav-link.active {
+  color: #0f172a;
+  background-color: #e0f2fe;
+}
+
+.vendor-navbar .btn {
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.vendor-greeting {
+  color: rgba(226, 232, 240, 0.9);
+  font-weight: 600;
+}
+
+.vendor-nav__list .nav-link {
+  font-weight: 600;
+  color: #0d6efd;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vendor-nav__list .nav-link i {
+  font-size: 14px;
+}
+
+.vendor-nav__list .nav-link.active {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.vendor-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 30px rgba(17, 116, 173, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(13, 110, 253, 0.08);
+}
+
+.vendor-metric {
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, rgba(13,110,253,0.08), rgba(13,110,253,0.02));
+  border: 1px solid rgba(13, 110, 253, 0.15);
+}
+
+.vendor-metric h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.vendor-metric span {
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+.vendor-status.badge {
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+}
+
+.vendor-banner-preview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.vendor-logo-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid rgba(13, 110, 253, 0.2);
+}
+
+.vendor-table img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.vendor-form label {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.vendor-form .form-control,
+.vendor-form .form-select {
+  border-radius: 10px;
+  border: 1px solid rgba(13,110,253,0.2);
+  padding: 10px 14px;
+}
+
+.vendor-form .form-control:focus,
+.vendor-form .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.vendor-actions .btn {
+  border-radius: 10px;
+}
+
+.vendor-empty {
+  padding: 40px;
+  text-align: center;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px dashed rgba(13, 110, 253, 0.3);
+}
+
+.vendor-empty i {
+  font-size: 48px;
+  color: #0d6efd;
+  margin-bottom: 16px;
+}
+
+.vendor-empty p {
+  margin-bottom: 16px;
+}

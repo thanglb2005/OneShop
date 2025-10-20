@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thống kê khách hàng - OneShop Admin</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/assets/css/atlantis.min.css" />
+    <link rel="stylesheet" href="/assets/css/atlantis.css" />
+    <link rel="stylesheet" href="/assets/css/demo.css" />
+    <link rel="stylesheet" href="/assets/css/fonts.min.css" />
+    <link rel="stylesheet" href="/fonts/fontawesome/fontawesome.min.css" />
+    <link rel="stylesheet" href="/css/admin-fonts.css" />
+    <style>
+      :root {
+        --section-gap: 30px;
+      }
+      body {
+        background: #f4f6f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        border-radius: 15px;
+        color: #fff;
+        margin-bottom: var(--section-gap);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      }
+      .stats-card {
+        background: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .stats-card .icon {
+        font-size: 2.6rem;
+        margin-bottom: 10px;
+      }
+      .stats-card .number {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #2c3e50;
+      }
+      .stats-card .label {
+        color: #7f8c8d;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-weight: 600;
+      }
+      .table-responsive {
+        background: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        margin-bottom: var(--section-gap);
+      }
+      .chart-container {
+        background: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        margin-bottom: var(--section-gap);
+        min-height: 520px;
+        position: relative;
+        overflow: hidden;
+      }
+      .chart-container canvas {
+        width: 100% !important;
+        height: 450px !important;
+        max-height: 450px;
+        display: block;
+      }
+      .chart-title {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+      .nav-tabs {
+        border: none;
+        margin-top: 0;
+        margin-bottom: var(--section-gap);
+      }
+      .alert-tables-section { margin-bottom: var(--section-gap) !important; }
+      .nav-tabs .nav-link {
+        border: none;
+        background: #fff;
+        margin-right: 12px;
+        padding: 14px 28px;
+        border-radius: 12px;
+        color: #7f8c8d;
+        font-weight: 700;
+        font-size: 1rem;
+        line-height: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      .nav-tabs .nav-link i { margin-right: 8px; font-size: 1rem; }
+      .nav-tabs .nav-link.active {
+        color: #fff;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 1px solid transparent;
+      }
+      .nav-tabs { display: flex; }
+      .nav-tabs .nav-item:nth-child(1) { order: 2; }
+      .nav-tabs .nav-item:nth-child(2) { order: 1; }
+      .customer-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .customer-email {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        font-weight: 600;
+      }
+      .statistics-page .admin-footer {
+        display: none !important;
+      }
+      .sidebar { width: 250px !important; }
+      .main-panel { margin-left: 250px !important; }
+      @media (min-width: 991px){
+        .sidebar_minimize .main-panel { width: calc(100% - 75px); margin-left: 75px !important; }
+      }
+      .row.mb-4 {
+        margin-bottom: var(--section-gap) !important;
+      }
+      
+      /* Loading states */
+      .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3em;
+      }
+      
+      .tab-content {
+        min-height: 400px;
+      }
+      
+      /* Tab animations */
+      .tab-pane {
+        transition: opacity 0.3s ease-in-out;
+      }
+      
+      .tab-pane.fade {
+        opacity: 0;
+      }
+      
+      .tab-pane.fade.show {
+        opacity: 1;
+      }
+      
+      /* Loading overlay */
+      .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        border-radius: 15px;
+      }
+      
+      /* Error states */
+      .alert-danger {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+      }
+      
+      /* Success states */
+      .alert-success {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+      }
+      
+      /* Tab navigation improvements */
+      .nav-tabs .nav-link {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      
+      .nav-tabs .nav-link:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+      }
+      
+      .nav-tabs .nav-link.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+      
+      .nav-tabs .nav-link.active:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        border-color: #5a6fd8;
+      }
+      
+      /* Tab content animations */
+      .tab-pane {
+        transition: opacity 0.3s ease-in-out;
+      }
+      
+      .tab-pane.fade:not(.show) {
+        opacity: 0;
+      }
+      
+      .tab-pane.fade.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body class="statistics-page">
+    <div class="wrapper">
+      <th:block th:replace="~{admin/fragments/header :: header}"></th:block>
+      <th:block th:replace="~{admin/fragments/navbar :: navbar}"></th:block>
+      <div class="main-panel">
+        <div class="content">
+          <div class="header">
+            <h3 class="mb-1">
+              <i class="fas fa-users"></i> Thống kê khách hàng
+            </h3>
+            <div class="text-light" style="opacity: 0.9">
+              Tổng quan khách hàng, đăng ký mới, hoạt động và xu hướng
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card text-center">
+                <div class="icon text-primary">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="number" id="kpiTotalUsers">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="label">Tổng số khách hàng</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card text-center">
+                <div class="icon text-success">
+                  <i class="fas fa-user-check"></i>
+                </div>
+                <div class="number" id="kpiActiveUsers">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="label">Khách hàng hoạt động</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card text-center">
+                <div class="icon text-info">
+                  <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="number" id="kpiNewUsersToday">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="label">Đăng ký hôm nay</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card text-center">
+                <div class="icon text-warning">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="number" id="kpiNewUsersThisMonth">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <div class="label">Đăng ký tháng này</div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="nav nav-tabs" id="customerTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                <i class="fas fa-chart-pie"></i> Tổng quan
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="registration-tab" data-bs-toggle="tab" data-bs-target="#registration" type="button" role="tab">
+                <i class="fas fa-chart-line"></i> Đăng ký
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="customers-tab" data-bs-toggle="tab" data-bs-target="#customers" type="button" role="tab">
+                <i class="fas fa-user-friends"></i> Khách hàng
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="customerTabsContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Phân bố trạng thái khách hàng</h5>
+                    <canvas id="statusChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Xu hướng đăng ký (12 tháng gần đây)</h5>
+                    <canvas id="registrationTrendChart"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Phân bố theo thời gian đăng ký</h5>
+                    <canvas id="distributionChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Đăng ký theo tháng</h5>
+                    <canvas id="monthlyRegistrationChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Registration Tab -->
+            <div class="tab-pane fade" id="registration" role="tabpanel">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Đăng ký theo ngày (30 ngày gần đây)</h5>
+                    <canvas id="dailyRegistrationChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Đăng ký theo năm</h5>
+                    <canvas id="yearlyRegistrationChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customers Tab -->
+            <div class="tab-pane fade" id="customers" role="tabpanel">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="table-responsive">
+                    <h5 class="chart-title">Khách hàng mới nhất</h5>
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Tên</th>
+                          <th>Email</th>
+                          <th>Ngày đăng ký</th>
+                          <th>Trạng thái</th>
+                        </tr>
+                      </thead>
+                      <tbody id="newestUsersTable">
+                        <tr>
+                          <td colspan="4" class="text-center">
+                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="table-responsive">
+                    <h5 class="chart-title">Top khách hàng theo giá trị đơn hàng</h5>
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Tên</th>
+                          <th>Số đơn</th>
+                          <th>Tổng chi</th>
+                          <th>Trung bình</th>
+                        </tr>
+                      </thead>
+                      <tbody id="topCustomersTable">
+                        <tr>
+                          <td colspan="4" class="text-center">
+                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/js/core/jquery.3.2.1.min.js"></script>
+    <script src="/assets/js/core/popper.min.js"></script>
+    <script src="/assets/js/core/bootstrap.min.js"></script>
+    <script src="/assets/js/plugin/chart.js/chart.min.js"></script>
+    <script src="/assets/js/atlantis.min.js"></script>
+    <script>
+      // Global variables for charts
+      let statusChart, registrationTrendChart, distributionChart, monthlyRegistrationChart;
+      let dailyRegistrationChart, yearlyRegistrationChart;
+
+      // Safe destroy chart function
+      function safeDestroy(chart) { 
+        try { 
+          chart && chart.destroy && chart.destroy(); 
+        } catch(_){}
+      }
+
+      async function loadKPIs() {
+        try {
+          const res = await fetch('/admin/customer-statistics/api/kpis', {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const data = await res.json();
+          console.log('KPIs:', data);
+
+          const totalUsersEl = document.getElementById('kpiTotalUsers');
+          const activeUsersEl = document.getElementById('kpiActiveUsers');
+          const newUsersTodayEl = document.getElementById('kpiNewUsersToday');
+          const newUsersThisMonthEl = document.getElementById('kpiNewUsersThisMonth');
+
+          console.log('KPI DOM:', { totalUsersEl, activeUsersEl, newUsersTodayEl, newUsersThisMonthEl });
+
+          if (totalUsersEl) totalUsersEl.innerText = data.totalUsers ?? 0;
+          if (activeUsersEl) activeUsersEl.innerText = data.activeUsers ?? 0;
+          if (newUsersTodayEl) newUsersTodayEl.innerText = data.newUsersToday ?? 0;
+          if (newUsersThisMonthEl) newUsersThisMonthEl.innerText = data.newUsersThisMonth ?? 0;
+        } catch (err) {
+          console.error('loadKPIs error:', err);
+          ['kpiTotalUsers','kpiActiveUsers','kpiNewUsersToday','kpiNewUsersThisMonth']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.innerText = '0'; });
+        }
+      }
+
+      // Load status statistics
+      async function loadStatusChart() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/status-statistics');
+          const data = await response.json();
+          
+          const ctx = document.getElementById('statusChart').getContext('2d');
+          safeDestroy(statusChart);
+          statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: data.map(item => item[1]), // status_name
+              datasets: [{
+                data: data.map(item => item[2]), // user_count
+                backgroundColor: ['#28a745', '#dc3545', '#6c757d'],
+                borderWidth: 2,
+                borderColor: '#fff'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'bottom'
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error loading status chart:', error);
+        }
+      }
+
+      // Load registration trend
+      async function loadRegistrationTrendChart() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/registration-trend');
+          const data = await response.json();
+          
+          const ctx = document.getElementById('registrationTrendChart').getContext('2d');
+          safeDestroy(registrationTrendChart);
+          registrationTrendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: data.map(item => `${item[0]}/${item[1]}`), // year/month
+              datasets: [{
+                label: 'Số khách hàng đăng ký',
+                data: data.map(item => item[2]), // user_count
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error loading registration trend chart:', error);
+        }
+      }
+
+      // Load distribution chart
+      async function loadDistributionChart() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/distribution-by-period');
+          const data = await response.json();
+          
+          const ctx = document.getElementById('distributionChart').getContext('2d');
+          safeDestroy(distributionChart);
+          distributionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: data.map(item => item[0]), // period
+              datasets: [{
+                label: 'Số khách hàng',
+                data: data.map(item => item[1]), // user_count
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: '#667eea',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error loading distribution chart:', error);
+        }
+      }
+
+      // Load monthly registration
+      async function loadMonthlyRegistrationChart() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/registration-by-month');
+          const data = await response.json();
+          
+          const ctx = document.getElementById('monthlyRegistrationChart').getContext('2d');
+          safeDestroy(monthlyRegistrationChart);
+          monthlyRegistrationChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: data.map(item => `${item[0]}/${item[1]}`), // year/month
+              datasets: [{
+                label: 'Đăng ký theo tháng',
+                data: data.map(item => item[2]), // user_count
+                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                borderColor: '#28a745',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error loading monthly registration chart:', error);
+        }
+      }
+
+      // Load daily registration
+      async function loadDailyRegistrationChart() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/registration-last-30-days');
+          const data = await response.json();
+          
+          const ctx = document.getElementById('dailyRegistrationChart').getContext('2d');
+          safeDestroy(dailyRegistrationChart);
+          dailyRegistrationChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: data.map(item => new Date(item[0]).toLocaleDateString('vi-VN')),
+              datasets: [{
+                label: 'Đăng ký theo ngày',
+                data: data.map(item => item[1]),
+                borderColor: '#17a2b8',
+                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error loading daily registration chart:', error);
+        }
+      }
+
+      // Load yearly registration
+      async function loadYearlyRegistrationChart() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/registration-by-year');
+          const data = await response.json();
+          
+          const ctx = document.getElementById('yearlyRegistrationChart').getContext('2d');
+          safeDestroy(yearlyRegistrationChart);
+          yearlyRegistrationChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: data.map(item => item[0]), // year
+              datasets: [{
+                label: 'Đăng ký theo năm',
+                data: data.map(item => item[1]), // user_count
+                backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                borderColor: '#ffc107',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error loading yearly registration chart:', error);
+        }
+      }
+
+      // Load newest users table
+      async function loadNewestUsersTable() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/newest-users');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          
+          const tbody = document.getElementById('newestUsersTable');
+          if (!tbody) {
+            console.error('newestUsersTable element not found');
+            return;
+          }
+          
+          tbody.innerHTML = '';
+          
+          if (data && data.length > 0) {
+            data.forEach(user => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td class="customer-name">${user[1] || 'N/A'}</td>
+                <td class="customer-email">${user[2] || 'N/A'}</td>
+                <td>${user[3] ? new Date(user[3]).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                <td>
+                  <span class="badge ${user[4] ? 'bg-success' : 'bg-danger'}">
+                    ${user[4] ? 'Hoạt động' : 'Không hoạt động'}
+                  </span>
+                </td>
+              `;
+              tbody.appendChild(row);
+            });
+          } else {
+            // Show sample data if no real data
+            const sampleData = [
+              ['1', 'Nguyễn Văn A', 'nguyenvana@email.com', new Date().toISOString(), true],
+              ['2', 'Trần Thị B', 'tranthib@email.com', new Date(Date.now() - 86400000).toISOString(), true],
+              ['3', 'Lê Văn C', 'levanc@email.com', new Date(Date.now() - 172800000).toISOString(), false]
+            ];
+            
+            sampleData.forEach(user => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td class="customer-name">${user[1]}</td>
+                <td class="customer-email">${user[2]}</td>
+                <td>${new Date(user[3]).toLocaleDateString('vi-VN')}</td>
+                <td>
+                  <span class="badge ${user[4] ? 'bg-success' : 'bg-danger'}">
+                    ${user[4] ? 'Hoạt động' : 'Không hoạt động'}
+                  </span>
+                </td>
+              `;
+              tbody.appendChild(row);
+            });
+            
+            // Add note about sample data
+            const noteRow = document.createElement('tr');
+            noteRow.innerHTML = '<td colspan="4" class="text-center text-muted"><small><em>Dữ liệu mẫu - Chưa có dữ liệu thực từ database</em></small></td>';
+            tbody.appendChild(noteRow);
+          }
+        } catch (error) {
+          console.error('Error loading newest users table:', error);
+          const tbody = document.getElementById('newestUsersTable');
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Lỗi tải dữ liệu khách hàng</td></tr>';
+          }
+        }
+      }
+
+      // Load top customers table
+      async function loadTopCustomersTable() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/top-customers-by-value');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          
+          const tbody = document.getElementById('topCustomersTable');
+          if (!tbody) {
+            console.error('topCustomersTable element not found');
+            return;
+          }
+          
+          tbody.innerHTML = '';
+          
+          if (data && data.length > 0) {
+            data.forEach(customer => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td class="customer-name">${customer[1] || 'N/A'}</td>
+                <td>${customer[2] || 0}</td>
+                <td>${customer[3] ? Number(customer[3]).toLocaleString('vi-VN') : 0} VNĐ</td>
+                <td>${customer[4] ? Number(customer[4]).toLocaleString('vi-VN') : 0} VNĐ</td>
+              `;
+              tbody.appendChild(row);
+            });
+          } else {
+            // Show sample data if no real data
+            const sampleData = [
+              ['1', 'Nguyễn Văn A', 5, 2500000, 500000],
+              ['2', 'Trần Thị B', 3, 1800000, 600000],
+              ['3', 'Lê Văn C', 2, 1200000, 600000]
+            ];
+            
+            sampleData.forEach(customer => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td class="customer-name">${customer[1]}</td>
+                <td>${customer[2]}</td>
+                <td>${Number(customer[3]).toLocaleString('vi-VN')} VNĐ</td>
+                <td>${Number(customer[4]).toLocaleString('vi-VN')} VNĐ</td>
+              `;
+              tbody.appendChild(row);
+            });
+            
+            // Add note about sample data
+            const noteRow = document.createElement('tr');
+            noteRow.innerHTML = '<td colspan="4" class="text-center text-muted"><small><em>Dữ liệu mẫu - Chưa có dữ liệu thực từ database</em></small></td>';
+            tbody.appendChild(noteRow);
+          }
+        } catch (error) {
+          console.error('Error loading top customers table:', error);
+          const tbody = document.getElementById('topCustomersTable');
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Lỗi tải dữ liệu khách hàng</td></tr>';
+          }
+        }
+      }
+
+      // Debug function to check data
+      async function debugData() {
+        try {
+          const response = await fetch('/admin/customer-statistics/api/debug');
+          const data = await response.json();
+          console.log('Debug data:', data);
+          return data;
+        } catch (error) {
+          console.error('Debug error:', error);
+          return null;
+        }
+      }
+
+      // Test KPIs API directly
+      async function testKPIsAPI() {
+        try {
+          console.log('Testing KPIs API...');
+          const response = await fetch('/admin/customer-statistics/api/kpis');
+          console.log('KPIs API response status:', response.status);
+          console.log('KPIs API response headers:', response.headers);
+          
+          if (response.ok) {
+            const data = await response.json();
+            console.log('KPIs API data:', data);
+            return data;
+          } else {
+            console.error('KPIs API error:', response.status, response.statusText);
+            return null;
+          }
+        } catch (error) {
+          console.error('KPIs API test error:', error);
+          return null;
+        }
+      }
+
+
+
+      // Enhanced tab switching with better UX
+      function switchTab(tabId) {
+        console.log('Switching to tab:', tabId);
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.nav-link').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Add active class to clicked tab
+        const activeTab = document.getElementById(tabId);
+        if (activeTab) {
+          activeTab.classList.add('active');
+        }
+        
+        // Hide all tab panes
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+          pane.classList.remove('show', 'active');
+        });
+        
+        // Show selected tab pane
+        let targetPaneId;
+        if (tabId === 'overview-tab') {
+          targetPaneId = 'overview';
+        } else if (tabId === 'registration-tab') {
+          targetPaneId = 'registration';
+        } else if (tabId === 'customers-tab') {
+          targetPaneId = 'customers';
+        }
+        
+        const targetPane = document.getElementById(targetPaneId);
+        if (targetPane) {
+          targetPane.classList.add('show', 'active');
+          console.log('Switched to pane:', targetPaneId);
+        } else {
+          console.error('Target pane not found:', targetPaneId);
+        }
+      }
+
+      // Reset tab state function
+      function resetTabState() {
+        // Reset to overview tab
+        switchTab('overview-tab');
+        console.log('Tab state reset to overview');
+      }
+
+      // Enhanced event listeners with better error handling
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          await loadKPIs(); // chạy trước để xóa spinner KPI
+        } catch (e) {
+          console.error(e);
+        }
+
+        // Tải các phần còn lại cho tab Overview nếu cần
+        await Promise.all([
+          loadStatusChart(),
+          loadRegistrationTrendChart(),
+          loadDistributionChart(),
+          loadMonthlyRegistrationChart()
+        ]);
+        
+        // Add click handlers with better UX
+        const overviewTab = document.getElementById('overview-tab');
+        const registrationTab = document.getElementById('registration-tab');
+        const customersTab = document.getElementById('customers-tab');
+        
+        if (overviewTab) {
+          overviewTab.addEventListener('click', async (e) => {
+            e.preventDefault();
+            switchTab('overview-tab');
+            console.log('Overview tab clicked');
+            
+            // Ensure overview charts are loaded
+            try {
+              if (!statusChart) {
+                await loadStatusChart();
+              }
+              if (!registrationTrendChart) {
+                await loadRegistrationTrendChart();
+              }
+              if (!distributionChart) {
+                await loadDistributionChart();
+              }
+              if (!monthlyRegistrationChart) {
+                await loadMonthlyRegistrationChart();
+              }
+            } catch (error) {
+              console.error('Error loading overview charts:', error);
+            }
+          });
+        }
+        
+        if (registrationTab) {
+          registrationTab.addEventListener('click', async (e) => {
+            e.preventDefault();
+            switchTab('registration-tab');
+
+            const registrationPane = document.getElementById('registration');
+            registrationPane.innerHTML = `
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Đăng ký theo ngày (30 ngày gần đây)</h5>
+                    <canvas id="dailyRegistrationChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container">
+                    <h5 class="chart-title">Đăng ký theo năm</h5>
+                    <canvas id="yearlyRegistrationChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            try {
+              await Promise.all([loadDailyRegistrationChart(), loadYearlyRegistrationChart()]);
+            } catch (error) {
+              console.error('Error loading registration data:', error);
+              registrationPane.innerHTML = `<div class="alert alert-danger">Lỗi tải dữ liệu đăng ký</div>`;
+            }
+          });
+        }
+        
+        if (customersTab) {
+          customersTab.addEventListener('click', async (e) => {
+            e.preventDefault();
+            switchTab('customers-tab');
+
+            const customersPane = document.getElementById('customers');
+            customersPane.innerHTML = `
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="table-responsive">
+                    <h5 class="chart-title">Khách hàng mới nhất</h5>
+                    <table class="table table-hover">
+                      <thead><tr><th>Tên</th><th>Email</th><th>Ngày đăng ký</th><th>Trạng thái</th></tr></thead>
+                      <tbody id="newestUsersTable"></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="table-responsive">
+                    <h5 class="chart-title">Top khách hàng theo giá trị đơn hàng</h5>
+                    <table class="table table-hover">
+                      <thead><tr><th>Tên</th><th>Số đơn</th><th>Tổng chi</th><th>Trung bình</th></tr></thead>
+                      <tbody id="topCustomersTable"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            try {
+              await Promise.all([loadNewestUsersTable(), loadTopCustomersTable()]);
+            } catch (error) {
+              console.error('Error loading customers data:', error);
+              customersPane.innerHTML = `<div class="alert alert-danger">Lỗi tải dữ liệu khách hàng</div>`;
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

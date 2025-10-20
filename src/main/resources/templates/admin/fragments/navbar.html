@@ -1,0 +1,211 @@
+<!-- Sidebar -->
+<div
+  th:fragment="navbar"
+  class="sidebar sidebar-style-2"
+  style="
+    position: fixed;
+    top: 60px;
+    left: 0;
+    bottom: 0;
+    z-index: 1028;
+    width: 250px;
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    margin: 0;
+    padding: 0;
+  "
+>
+  <style>
+    .nav-item .collapse {
+      display: none;
+    }
+    .nav-item .collapse.show {
+      display: block;
+    }
+    .nav-item.active > a {
+      background-color: #007bff !important;
+      color: #fff !important;
+    }
+    .nav-item .caret {
+      transition: transform 0.3s ease;
+    }
+    .nav-item.active .caret {
+      transform: rotate(90deg);
+    }
+  </style>
+  <div class="sidebar-wrapper scrollbar scrollbar-inner">
+    <div class="sidebar-content">
+      <!-- User Profile -->
+      <div class="user">
+        <div class="avatar-sm float-left mr-2">
+          <img
+            src="/assets/img/profile.jpg"
+            alt="..."
+            class="avatar-img rounded-circle"
+          />
+        </div>
+        <div class="info">
+          <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
+            <span>
+              Tên: Admin OneShop
+              <span class="user-level">Administrator</span>
+            </span>
+          </a>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <ul class="nav nav-primary">
+        <li class="nav-item active">
+          <a
+            data-toggle="collapse"
+            href="#dashboard"
+            class="collapsed"
+            aria-expanded="false"
+            data-tooltip="Trang chủ"
+          >
+            <i class="fas fa-home"></i>
+            <p>Trang chủ</p>
+            <span class="caret"></span>
+          </a>
+          <div class="collapse" id="dashboard">
+            <ul class="nav nav-collapse">
+              <li>
+                <a th:href="@{/admin/home}">
+                  <span class="sub-item">Trang chủ</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="nav-section">
+          <span class="sidebar-mini-icon">
+            <i class="fa fa-ellipsis-h"></i>
+          </span>
+          <h4 class="text-section">Các thành phần</h4>
+        </li>
+
+        <li class="nav-item">
+          <a th:href="@{/admin/shops}" data-tooltip="Duyệt đăng ký shop">
+            <i class="fas fa-store"></i>
+            <p>Duyệt Shop</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            data-toggle="collapse"
+            href="#tables"
+            data-tooltip="Hệ thống quản lý"
+          >
+            <i class="fas fa-table"></i>
+            <p>Hệ thống quản lý</p>
+            <span class="caret"></span>
+          </a>
+          <div class="collapse" id="tables">
+            <ul class="nav nav-collapse">
+              <li>
+                <a th:href="@{/admin/categories}">
+                  <span class="sub-item">Quản lý Thể loại</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/products}">
+                  <span class="sub-item">Quản lý Sản phẩm</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/shops}">
+                  <span class="sub-item">Quản lý Shop</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/brands}">
+                  <span class="sub-item">Quản lý Thương hiệu</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/shippers-list}">
+                  <span class="sub-item">Quản lý Shipper</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/orders}">
+                  <span class="sub-item">Quản lý Đơn hàng</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/users}">
+                  <span class="sub-item">Quản lý Khách hàng</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/promotions}">
+                  <span class="sub-item">Quản Lý Khuyến Mãi</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a
+            data-toggle="collapse"
+            href="#charts"
+            data-tooltip="Thống kê doanh số"
+          >
+            <i class="far fa-chart-bar"></i>
+            <p>Thống kê doanh số</p>
+            <span class="caret"></span>
+          </a>
+          <div class="collapse" id="charts">
+            <ul class="nav nav-collapse">
+              <li>
+                <a href="/admin/statistics#overview">
+                  <span class="sub-item">Dashboard thống kê</span>
+                </a>
+              </li>
+              <li>
+                <a href="/admin/statistics#products">
+                  <span class="sub-item">Thống kê sản phẩm</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/category-statistics}">
+                  <span class="sub-item">Thống kê danh mục</span>
+                </a>
+              </li>
+              <li>
+                <a href="/admin/statistics#brands">
+                  <span class="sub-item">Thống kê thương hiệu</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/customer-statistics}">
+                  <span class="sub-item">Thống kê khách hàng</span>
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/admin/revenue-statistics}">
+                  <span class="sub-item">Thống kê doanh thu</span>
+                </a>
+              </li>
+              <li>
+                <a href="/admin/statistics#products">
+                  <span class="sub-item">Sản phẩm bán chạy</span>
+                </a>
+              </li>
+              <li>
+                <a href="/admin/statistics#products">
+                  <span class="sub-item">Sản phẩm yêu thích</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

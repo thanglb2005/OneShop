@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Khuyến mãi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .vendor-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div th:replace="~{vendor/fragments/nav :: vendorNav('promotions')}"></div>
+
+    <main class="container py-4">
+        <!-- Alerts -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i><span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+            <!-- Header -->
+        <section class="vendor-section mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                        <div>
+                    <h2 class="h4 mb-1">Quản lý Khuyến mãi</h2>
+                    <p class="text-muted mb-0">Tạo và quản lý các chương trình khuyến mãi cho shop của bạn.</p>
+                        </div>
+                <div class="d-flex gap-2 mt-3 mt-md-0">
+                    <a th:href="@{/vendor/promotions/create(shopId=${selectedShopId})}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Tạo khuyến mãi mới
+                        </a>
+                    </div>
+                </div>
+        </section>
+
+        <!-- Main Content -->
+        <section class="vendor-section">
+            <p th:if="${vendorShops != null and !vendorShops.isEmpty()}">
+                Đang xem khuyến mãi cho shop:
+                <strong th:text="${selectedShop.shopName}"></strong>
+            </p>
+            
+            <!-- Filter Section -->
+            <div class="mb-4">
+                <form method="get" th:action="@{/vendor/promotions}">
+                    <input type="hidden" name="shopId" th:value="${selectedShopId}" />
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Tên khuyến mãi</label>
+                            <input type="text" class="form-control" name="name" th:value="${name}" placeholder="Tìm theo tên...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Mã khuyến mãi</label>
+                            <input type="text" class="form-control" name="code" th:value="${code}" placeholder="Tìm theo mã...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Loại</label>
+                            <select class="form-select" name="type">
+                                <option value="">Tất cả</option>
+                                <option th:each="promotionType : ${promotionTypes}" 
+                                        th:value="${promotionType.name()}" 
+                                        th:text="${promotionType.displayName}"
+                                        th:selected="${type == promotionType.name()}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" name="status">
+                                <option value="">Tất cả</option>
+                                <option value="active" th:selected="${status == 'active'}">Hoạt động</option>
+                                <option value="inactive" th:selected="${status == 'inactive'}">Tạm dừng</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-search me-1"></i>Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Table of Promotions -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Tên khuyến mãi</th>
+                            <th>Mã</th>
+                            <th>Loại</th>
+                            <th>Giá trị</th>
+                            <th>Thời gian hiệu lực</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="promo : ${promotions.content}">
+                            <td>
+                                <div class="fw-bold" th:text="${promo.promotionName}"></div>
+                                <small class="text-muted" th:text="${promo.description}"></small>
+                            </td>
+                            <td class="font-monospace" th:text="${promo.promotionCode}"></td>
+                            <td th:text="${promo.promotionType.name() == 'PERCENTAGE' ? 'Phần trăm' : 'Số tiền cố định'}"></td>
+                            <td>
+                                <span th:if="${promo.promotionType.name() == 'PERCENTAGE'}" th:text="${#numbers.formatDecimal(promo.discountValue, 1, 'COMMA', 2, 'POINT')} + '%'"></span>
+                                <span th:if="${promo.promotionType.name() == 'FIXED_AMOUNT'}" th:text="${#numbers.formatDecimal(promo.discountValue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                            </td>
+                            <td>
+                                <span th:text="${#temporals.format(promo.startDate, 'dd/MM/yy')}"></span> -
+                                <span th:text="${#temporals.format(promo.endDate, 'dd/MM/yy')}"></span>
+                            </td>
+                            <td>
+                                <span th:if="${promo.isActive and #temporals.createNow().isAfter(promo.endDate)}" class="status-badge bg-secondary">Hết hạn</span>
+                                <span th:if="${promo.isActive and #temporals.createNow().isBefore(promo.startDate)}" class="status-badge bg-info">Sắp diễn ra</span>
+                                <span th:if="${promo.isActive and !(#temporals.createNow().isAfter(promo.endDate) or #temporals.createNow().isBefore(promo.startDate))}" class="status-badge bg-success">Đang hoạt động</span>
+                                <span th:if="${!promo.isActive}" class="status-badge bg-warning">Tạm dừng</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a th:href="@{/vendor/promotions/edit/{id}(id=${promo.promotionId}, shopId=${selectedShopId})}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                    <form th:action="@{/vendor/promotions/delete/{id}(id=${promo.promotionId}, shopId=${selectedShopId})}" method="post" onsubmit="return confirm('Bạn chắc chắn muốn xóa khuyến mãi này?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </form>
+                                            </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${promotions.isEmpty()}">
+                            <td colspan="7" class="text-center text-muted py-4">Không tìm thấy khuyến mãi nào.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+            <div th:if="${promotions.totalPages > 1}" class="d-flex justify-content-center mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${promotions.first ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/vendor/promotions(shopId=${selectedShopId}, page=${promotions.number - 1}, size=${promotions.size}, name=${name}, code=${code}, type=${type}, status=${status})}">&laquo;</a>
+                                    </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, promotions.totalPages - 1)}" th:classappend="${i == promotions.number ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/vendor/promotions(shopId=${selectedShopId}, page=${i}, size=${promotions.size}, name=${name}, code=${code}, type=${type}, status=${status})}" th:text="${i + 1}"></a>
+                                    </li>
+                        <li class="page-item" th:classappend="${promotions.last ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/vendor/promotions(shopId=${selectedShopId}, page=${promotions.number + 1}, size=${promotions.size}, name=${name}, code=${code}, type=${type}, status=${status})}">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+        </section>
+    </main>
+</body>
+</html>

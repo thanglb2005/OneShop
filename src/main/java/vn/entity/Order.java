@@ -1,0 +1,140 @@
+package vn.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "orders")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_id")
+    private Long orderId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
+
+    @Column(name = "customer_email", nullable = false)
+    private String customerEmail;
+
+    @Column(name = "customer_phone", nullable = false)
+    private String customerPhone;
+
+    @Column(name = "shipping_address", nullable = false)
+    private String shippingAddress;
+    
+    @Column(name = "pickup_address")
+    private String pickupAddress;  // Địa chỉ lấy hàng (từ shop/vendor)
+    
+    @Column(name = "package_type")
+    private String packageType;  // Loại hàng: Hàng nhỏ, Hàng dễ vỡ, Thực phẩm, etc.
+    
+    @Column(name = "weight")
+    private Double weight;  // Khối lượng (kg)
+
+    @Column(name = "note", length = 1000)
+    private String note;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 50, nullable = false)
+    private OrderStatus status = OrderStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
+    private PaymentMethod paymentMethod = PaymentMethod.COD;
+
+    @Column(name = "total_amount", nullable = false)
+    private Double totalAmount;
+
+    @Column(name = "order_date", nullable = false)
+    private LocalDateTime orderDate = LocalDateTime.now();
+
+    @Column(name = "shipped_date")
+    private LocalDateTime shippedDate;
+
+    @Column(name = "delivered_date")
+    private LocalDateTime deliveredDate;
+
+    @Column(name = "cancelled_date")
+    private LocalDateTime cancelledDate;
+
+    @Column(name = "cancellation_reason", length = 1000)
+    private String cancellationReason;
+
+    @Column(name = "tracking_number", length = 100)
+    private String trackingNumber;
+
+    @Column(name = "shipping_fee")
+    private Double shippingFee = 0.0;
+
+    @Column(name = "discount_amount")
+    private Double discountAmount = 0.0;
+
+    @Column(name = "final_amount")
+    private Double finalAmount = 0.0;
+
+    @Column(name = "estimated_delivery_date")
+    private LocalDateTime estimatedDeliveryDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shipper_id")
+    private User shipper;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderDetail> orderDetails;
+
+    // Payment fields from DB schema
+    // Note: DB stores payment_status as BIT (0/1). We map it to Boolean for simplicity.
+    @Column(name = "payment_status", nullable = false)
+    private Boolean paymentPaid = false; // true = PAID, false = not paid
+
+    @Column(name = "payment_date")
+    private LocalDateTime paymentDate;
+
+    // MoMo payment specific fields
+    @Column(name = "momo_transaction_id")
+    private String momoTransactionId;
+
+    @Column(name = "momo_request_id")
+    private String momoRequestId;
+
+    public enum OrderStatus {
+        PENDING,                // Cho xac nhan
+        NEW,                    // Don hang moi
+        CONFIRMED,              // Da xac nhan
+        SHIPPING,               // Dang giao
+        DELIVERED,              // Da giao
+        CANCELLED,              // Huy (chuan - 2 chu L)
+        RETURNED                // Tra hang - hoan tien
+    }
+
+    public enum PaymentMethod {
+        COD,
+        MOMO,
+        BANK_TRANSFER,
+        VIETQR
+    }
+
+    public enum PaymentStatus {
+        PENDING,    // Chờ thanh toán
+        PAID,       // Đã thanh toán
+        FAILED      // Thanh toán thất bại
+    }
+}

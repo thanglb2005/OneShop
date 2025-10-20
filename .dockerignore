@@ -1,0 +1,53 @@
+# Maven
+target/
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Local development files
+.env
+.env.local
+
+# Upload directory (will be created in container)
+upload/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node.js (if any)
+node_modules/
+npm-debug.log
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore

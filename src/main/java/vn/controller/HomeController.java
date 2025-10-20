@@ -17,6 +17,7 @@ import vn.service.ProductService;
 import vn.service.ShopService;
 import vn.entity.Product;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.List;
@@ -43,6 +44,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(HttpServletRequest request, HttpSession session, Model model,
                       @RequestParam(value = "shopId", required = false) Long shopId) {
+        try {
         User user = (User) session.getAttribute("user");
         
         // If no user in session, check for Remember Me cookie
@@ -54,19 +56,32 @@ public class HomeController {
         }
         
         model.addAttribute("user", user);
-        model.addAttribute("categories", categoryService.getAllCategories());
+        try {
+            model.addAttribute("categories", categoryService.getAllCategories());
+        } catch (Exception e) {
+            model.addAttribute("categories", new ArrayList<>());
+        }
         
         // Add shop list for filtering
-        List<Shop> activeShops = shopService.findAll().stream()
-                .filter(shop -> shop.getStatus() == Shop.ShopStatus.ACTIVE)
-                .collect(Collectors.toList());
+        List<Shop> activeShops;
+        try {
+            activeShops = shopService.findAll().stream()
+                    .filter(shop -> shop.getStatus() == Shop.ShopStatus.ACTIVE)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            activeShops = new ArrayList<>();
+        }
         model.addAttribute("shopList", activeShops);
         model.addAttribute("selectedShopId", shopId);
         
         // Add cart count for header
         if (user != null) {
-            int cartCount = cartService.getCartItemCount(user);
-            model.addAttribute("totalCartItems", cartCount);
+            try {
+                int cartCount = cartService.getCartItemCount(user);
+                model.addAttribute("totalCartItems", cartCount);
+            } catch (Exception e) {
+                model.addAttribute("totalCartItems", 0);
+            }
         } else {
             model.addAttribute("totalCartItems", 0);
         }
@@ -77,10 +92,14 @@ public class HomeController {
         
         if (shopId != null) {
             // Filter products by shop
-            newestProducts = productService.findByShopId(shopId).stream()
-                    .filter(p -> Boolean.TRUE.equals(p.getStatus()))
-                    .limit(20)
-                    .collect(Collectors.toList());
+            try {
+                newestProducts = productService.findByShopId(shopId).stream()
+                        .filter(p -> Boolean.TRUE.equals(p.getStatus()))
+                        .limit(20)
+                        .collect(Collectors.toList());
+            } catch (Exception e) {
+                newestProducts = new ArrayList<>();
+            }
             
             // For best sale products, we'll use the same shop filter
             List<Object[]> bestSale = productService.bestSaleProduct20();
@@ -104,9 +123,18 @@ public class HomeController {
             }
         } else {
             // Show all products (original behavior)
-            newestProducts = productService.listProductNew20();
+            try {
+                newestProducts = productService.listProductNew20();
+            } catch (Exception e) {
+                newestProducts = new ArrayList<>();
+            }
             
-            java.util.List<Object[]> bestSale = productService.bestSaleProduct20();
+            java.util.List<Object[]> bestSale;
+            try {
+                bestSale = productService.bestSaleProduct20();
+            } catch (Exception e) {
+                bestSale = new ArrayList<>();
+            }
             if (bestSale != null && !bestSale.isEmpty()) {
                 java.util.List<Long> ids = new java.util.ArrayList<>();
                 for (Object[] row : bestSale) {
@@ -142,9 +170,26 @@ public class HomeController {
         model.addAttribute("bestSaleProduct20", bestSaleProducts);
 
         // Category counts for suggest slider like greeny-shop
-        model.addAttribute("coutnProductByCategory", productService.listCategoryByProductName());
+        try {
+            model.addAttribute("coutnProductByCategory", productService.listCategoryByProductName());
+        } catch (Exception e) {
+            model.addAttribute("coutnProductByCategory", new ArrayList<>());
+        }
 
         return "web/home";
+        } catch (Exception e) {
+            // Log error and return simple page
+            System.err.println("HomeController error: " + e.getMessage());
+            e.printStackTrace();
+            
+            model.addAttribute("categories", new ArrayList<>());
+            model.addAttribute("shopList", new ArrayList<>());
+            model.addAttribute("productList", new ArrayList<>());
+            model.addAttribute("bestSaleProduct20", new ArrayList<>());
+            model.addAttribute("totalCartItems", 0);
+            model.addAttribute("error", "Database loading...");
+            return "web/home";
+        }
     }
     
     // Helper method to check Remember Me cookie (same as in LoginController)

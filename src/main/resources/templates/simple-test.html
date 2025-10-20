@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneShop Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        .success { color: green; font-size: 24px; }
+        .info { color: blue; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1 class="success">✅ OneShop Deploy Success!</h1>
+    
+    <div class="info">
+        <p><strong>Message:</strong> <span th:text="${message}">Test message</span></p>
+        <p><strong>Timestamp:</strong> <span th:text="${timestamp}">Current time</span></p>
+        <p><strong>Server:</strong> Render.com</p>
+        <p><strong>Database:</strong> Railway MySQL</p>
+    </div>
+    
+    <h2>Test Links:</h2>
+    <ul>
+        <li><a href="/home-test">Test Home Page</a></li>
+        <li><a href="/actuator/health">Health Check</a></li>
+        <li><a href="/">Main Home (may error)</a></li>
+        <li><a href="/login">Login Page</a></li>
+    </ul>
+    
+    <h2>Next Steps:</h2>
+    <ol>
+        <li>Import database data</li>
+        <li>Test all pages</li>
+        <li>Configure OAuth URLs</li>
+        <li>Add sample products</li>
+    </ol>
+</body>
+</html>
